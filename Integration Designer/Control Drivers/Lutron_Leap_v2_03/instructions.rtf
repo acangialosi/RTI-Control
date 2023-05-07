@@ -1,0 +1,168 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Arial;}{\f1\fswiss\fprq2\fcharset0 Calibri;}{\f2\fnil\fcharset0 Calibri;}}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\nowidctlpar\b\f0\fs28 Lutron LEAP for RA3 and QSX\par
+\fs24 This Auto-Config driver is designed for Integration Designer 10 and newer. \par
+\b0\fs20 Version 10.10.1 or higher is required\par
+\par
+This driver is designed to use Lutron's LEAP protocol and tested with a Lutron HQP7-2 processor and a Radio RA3 processor. This driver is only intended for use with QSX and RA3, not Caseta.\par
+\b\par
+Please Note: To use v2.0 in a system which has been using v1.x you will need to delete the Lutron Driver and start from scratch.\par
+\par
+*** \ul Important Note: REQUIRES Lutron Software 22.5\ulnone  ***\par
+\par
+\ul Revision History\ulnone\par
+
+\pard\nowidctlpar\fi-720\li720 2.0\tab\b0 Updated Driver to support multiple sources with the same name, and support programing offsite after initial connection. Fixes an issue with Raise/Lower commands for lights not issuing stop after letting go of the button.\par
+
+\pard\nowidctlpar\b 2.01\tab\b0 Updated script to remove error that occured when driver had not been connected to a \tab Lutron Processor.\par
+\b 2.02\tab\b0 Updated LED state variables table\par
+\b 2.03\b0  \tab Added Fan Controllers to available load types to pull into Integration Designer\par
+\b\fs24\par
+Adding the Driver\par
+\b0\fs20\tab The driver is added via the Drivers tab in the Add Workspace Item dialog. The driver is named 'Lutron LEAP' and initially offers only the processor as a source to add to the system. It does not matter what room the processor is added to.\par
+\tab Once the processor is added you must add the connection information: IP Address, Port, and Login information, in the Driver Properties.\par
+\par
+\b\fs24 Adding the remaining sources\par
+\b0\fs20\tab While the Lutron Leap driver is selected, two additional buttons will be in the Driver Configuration. One will be labelled 'Connect to Lutron Processor', the other is labelled 'Driver Sync'. Once the connection information has been entered, the 'Connect to Lutron Processor' button must be used to connect the driver to the processor and collect the current system stored there. Once that has been done ID will know the configuration of the Lutron processor and will make those devices available to the driver. Any time that the Lutron project is changed via Homeworks, this button should be used to update the copy of the project that ID is using. The Driver Sync button runs the routines that are called as new sources are added to the project. You should not need to use this button but occasionally ID may not refresh the listed commands or variables. In this case pressing this button causes those routines to be run again.\par
+\tab Returning to the Drivers tab of the Add Workspace Item, the driver should now be listed under the 'Add To Existing Driver', and should contain each of the \ldblquote Areas\rdblquote  you have defined in your Homeworks file. Expanding these sections will show the devices that are currently programmed into the Lutron System. These devices will be removed from this list as they are added to rooms. As you add sources to the workspace functions, variables, and events for the sources will show up within Integration Designer.\par
+\i\par
+
+\pard\widctlpar\b\i0\fs24 Connecting the Lutron Processor to your RTI Processor\par
+\~\~\~\~\~\~\~\~\~\~\~ \b0\fs20 After pushing your Integration Designer file to the RTI processor, it will establish an initial connection to the Lutron system, after this connection is established a System Variable for "Pairing Required" will flag true as well as a statement will print to the system log to push the button on the Lutron bridge, this will give RTI access to negotiate authorization with the bridge. This will only need to be done the first time you connect your RTI processor to the Lutron Bridge, subsequent connections should work from memory, if they do not there is a function "Erase Pairing Info" to call from a RTI panel which will reset the system to no longer hold onto the needed authorization information. After calling this function you will need to reset the RTI processor to reestablish the connection to Lutron and start over in the pairing process.\i\par
+
+\pard\nowidctlpar\tab\i0\par
+\b\fs24 Commands\par
+\b0\fs20\tab Integration Designer will build the commands for devices as they are added to the system:\par
+
+\pard\nowidctlpar\tx270\tx540\b\tab Lights\b0 : \par
+\tab\tab Dimming Loads: Lighting Loads have commands to set their level from 1-100, as well as turn them off, on, and toggle them. They do not remember their former level and will toggle between off and full brightness.\par
+\tab\tab Switched Loads: Switched Loads have the same commands, without the Raise, Lower, and Stop. Sending a command to set the level will turn the light on if the level is greater than 0, and off if the level IS 0.\par
+\tab\tab SpectrumTune (Ketra): These have the same commands again, but add commands to set the Hue, Saturation, Vibrancy, and White Tuning. These commands are only available for lights that support them.\par
+\par
+\tab WARNING: There is a bug in the Lutron system. If you set the saturation to 0, the hue may change. The slliders are set in the driver to only allow and adjustment from 1-100.\par
+\par
+\b\tab Shade Groups\b0 : \par
+\tab\tab Shades can be sent to a specific level (1-100).  They also have a raise and lower command that will continue until the stop command is sent, or the shade reaches the top or bottom of its travel. Stop is also important to getting correct feedback of the shade. The raise/lower commands are not reliable for feedback, using Set Point commands is recommended for Shade control. If a shade group includes the ability to tilt, the command to set the tilt will be included.\par
+\par
+\tab\b Control Stations:\par
+\tab\tab\b0 The Control Stations will have commands to emulate the pressing of their buttons. The commands will appear in ID with both their button number and the engraving text that was entered in Homeworks to help identify them. The commands will default to Press and Release, but Press and Hold, Release, and Multitap are also available. These must be programmed correctly in Homeworks to work correctly \line\tab\tab Lutron button numbers vary greatly from device to device and occasionally have two different numbers. The buttons appear in ID with a name\par
+
+\pard\nowidctlpar\par
+\par
+\par
+\b\fs24 Variables\par
+\b0\fs20\tab Integration Designer will also build the variables for the devices:\par
+\par
+
+\pard\nowidctlpar\li810\ri630\tx810\i Note: When using Raise and Lower commands on Lights and Shades, the level will not be updated until the stop command is received.  Even if the device reaches a top of bottom limit.\par
+\par
+
+\pard\nowidctlpar\tx270\tx540\b\i0\tab Lights\b0 : \par
+\tab\tab Dimming Loads: Most loads will have a Name, a Level, and a State. The state will be true, or on, for any value greater than 0.\par
+\tab\tab Switched Loads: Have the same variables and will show a level of 100 whenever they are turned on.\par
+\tab\tab SpectrumTune (Ketra): These have level variables for Hue, Saturation, Vibrancy, and White Tuning. The Hue and Saturation levels will adjust for any change in White Tuning, but the Tuning Level does not adjust for changes in Hue or Saturation.\par
+\par
+\b\tab Shade Groups\b0 : \par
+\tab\tab Shades have a Name variable and can show their current level. They have a variable for when they are closed and two \lquote Open\rquote  variables: One any time they are not at bottom (0), and another for when they are at the top (100). These two variables also have different tags, as shown below. Tiltable shades will also include a Tilt variable.\par
+\par
+\tab\b Control Stations:\par
+\tab\tab\b0 The Control Stations themselves only have a Name variable. Each button on the station will have a name of its own, which is automatically filled from the Engraving Text entered in to Homeworks. It will also have an LED state variable if the button has an LED associated with it.\par
+
+\pard\nowidctlpar\par
+
+\pard\nowidctlpar\tx270\tx540\tab\b Others:\par
+\tab\tab\b0 Overall variables also exist for the connection state of the driver\par
+
+\pard\nowidctlpar\par
+\par
+\b\fs24 Events\par
+\b0\fs20\tab Integration Designer will also build the variables for the devices:\par
+
+\pard\nowidctlpar\tx270\tx540\b\tab Lights\b0 : \par
+\tab\tab All lights have events when they turn on and off\par
+\par
+\b\tab Shade Groups\b0 : \par
+\tab\tab Shades have a slightly more complicated set of events to help you know roughly where they are in their travel. They have events for when the hit the top and bottom of their travel, and events for when they leave those positions. As an example, if a shade is at the bottom and is sent to level 50, it will trigger the \lquote Not fully closed\rquote  event, but NOT the Open event. If it subsequently does move to the top, the event Open event will be triggered. When it leaves the fully open position, the matching event will be triggered, with the Closed Event being triggered only when the shade is completely closed.\par
+\tab\tab It is probable that the Closed, and Not Fully Closed events will be the most used. One thing to be careful of is that the Lutron system sends differing status messages to the driver, depending on how the shades are operated. If a Control Station button is programmed with a Raise command, the system will immediately send the driver a status message that says that the shade is fully open. Only when you stop the travel will the number be updated again. The same thing happens with a Lower command sending a fully closed status. If you use the Raise and Lower commands in the driver however, the Lutron system never sends any updates, and no events will be triggered, until an actual Stop command is received.\par
+\par
+\tab\b Control Stations:\par
+\tab\tab\b0 The Control Stations will trigger events when any button is pressed, or when the status of any LED changes.\par
+
+\pard\nowidctlpar\par
+\par
+\par
+
+\pard\nowidctlpar\tx180\tx360\b Tags\b0 :\par
+\tab Lights\par
+\tab\tab Instance ID: The name of the light\par
+\tab\tab Light Level: Sliders and direct set commands\par
+\tab\tab Light: Toggles light and shows on/off state (for button control)\par
+\tab\tab Light On: Discrete on command and light state\par
+\tab\tab Light Off: Discrete off command\par
+\tab\tab Light Up: Fades the light up\par
+\tab\tab Light Down: Fades the light down\par
+\tab\tab Light Stop: Stops the fading (In this driver, the level and state variables are not updated while the light is fading, only when the fading is stopped)\par
+\par
+\tab\tab Light Hue Level: Sets the Hue of the Ketra lights, and displays the Hue Level\par
+\tab\tab Light Saturation Level: Set and displays Saturation\par
+\tab\tab Light Temperature: Sets the Color Temperature of the lights (Changing Color Temp will update Hue and Saturation, but changing Hue or Saturation DOES NOT update Color Temp)\par
+\par
+\tab Fans:\par
+\tab\tab Instance ID: The name of the fan\par
+\tab\tab Fan Level: Slider control and status\par
+\tab\tab Fan: shows on/off state \par
+\tab\tab Light Off: Discrete Fan Speed command and boolean speed indicator\par
+\tab\tab Light Low: Discrete Fan Speed command and boolean speed indicator\par
+\tab\tab Light Medium: Discrete Fan Speed command and boolean speed indicator\par
+\tab\tab Light Medium High: Discrete Fan Speed command and boolean speed indicator\par
+\tab\tab Light High: Discrete Fan Speed command and boolean speed indicator\par
+\par
+\tab Shades:\par
+\tab\tab Instance ID: The name of the shade\par
+\tab\tab Shade Level: Sliders and Direct set\par
+\tab\tab Shade Up: Starts the shade op (Does not update variable)\par
+\tab\tab Shade Down: Starts the shade down (Does not update the variable)\par
+\tab\tab Shade Stop: Stops the shade\par
+\par
+\tab\tab Shade Tilt: Sets (and displays) Tilt level for tiltable shades\par
+\par
+\tab Control Stations:\par
+\tab\tab Instance ID: The name of the Control Station\par
+\tab\tab Button Name x: Name of Button 1 (Will show the engraved text as programmed in Homeworks)\par
+\tab\tab Button x: Press and Release Button x, Shows the LED state of Button x\par
+\par
+\b Events\par
+\tab\b0 Lights\par
+\tab\tab On\par
+\tab\tab Off\par
+\par
+\tab Fans:\par
+\tab\tab On\par
+\tab\tab Off\par
+\tab\tab Low\par
+\tab\tab Medium\par
+\tab\tab Medium High\par
+\tab\tab Hign\par
+\par
+\tab Shades\par
+\tab\tab Open: Triggers when shade hits 100%\par
+\tab\tab Not Open: Triggers when Shade is no longer at 100%\par
+\tab\tab Closed: Triggers when shade hits 0 (Completely closed)\par
+\tab\tab Not Closed: Triggers when shade is no longer at 0\par
+\par
+\tab Control Stations:\par
+\i\tab\tab The event you receive is dependent on the programming of the button in Homeworks\par
+\i0\tab\tab Button Press\par
+\tab\tab Button Release\par
+\tab\tab Button Multitap\par
+\tab\tab Button LongHold\par
+\tab\tab LED On\par
+\tab\tab LED Off\tab\tab\tab\par
+\tab\tab\par
+
+\pard\widctlpar\sa160\sl252\slmult1\f1\fs22\par
+\b\f0\fs28\par
+
+\pard\sa200\sl276\slmult1\b0\f2\fs22\lang9\par
+}
+ 
